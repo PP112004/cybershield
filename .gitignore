@@ -1,0 +1,22 @@
+# bank-provided data & organizer material — never publish
+data/
+docs/
+
+# superseded local files kept for reference
+archive/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# logs & OS noise
+*.log
+.DS_Store
+
+# local Claude Code session config / working notes
+.claude/
+CLAUDE.md
+MEMORY.md

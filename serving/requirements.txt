@@ -1,0 +1,19 @@
+# --- API serving ---
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.6
+httpx>=0.27            # LLM providers (DeepSeek/Gemini REST) + FastAPI TestClient
+
+# --- model inference (must match the versions the .pkl was trained with) ---
+scikit-learn==1.8.0
+lightgbm==4.6.0
+pandas>=2.0
+numpy>=1.26
+
+# --- optional ---
+# xgboost==3.2.0           # only to load the full-feature discovery model
+# imbalanced-learn>=0.12   # only to load the legacy SMOTE-pipeline pickles
+# androguard               # only for the local-only /analyze-apk binary path
+
+# --- tests ---
+pytest>=8.0

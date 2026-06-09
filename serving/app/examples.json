@@ -1,0 +1,77 @@
+{
+  "clear_mule": {
+    "description": "Confirmed mule account, highest model score",
+    "actual_label": 1,
+    "model_score": 0.999824,
+    "features": {
+      "F115": 1.0,
+      "F321": 1.17,
+      "F527": 1.05,
+      "F531": 1.18,
+      "F670": 1.0,
+      "F1692": 0.0,
+      "F2082": 0.0,
+      "F2122": 0.0,
+      "F2582": -0.05,
+      "F2678": null,
+      "F2737": -0.14,
+      "F2956": 25.0,
+      "F3043": null,
+      "F3836": 8384.86,
+      "F3887": 57,
+      "F3889": "G365D",
+      "F3891": "student",
+      "F3894": 24.0
+    }
+  },
+  "clear_legit": {
+    "description": "Legitimate account, lowest model score",
+    "actual_label": 0,
+    "model_score": 0.0,
+    "features": {
+      "F115": null,
+      "F321": null,
+      "F527": null,
+      "F531": null,
+      "F670": 0.0,
+      "F1692": 0.0,
+      "F2082": 0.0,
+      "F2122": 0.0,
+      "F2582": -0.07,
+      "F2678": -0.14,
+      "F2737": -0.54,
+      "F2956": 58.0,
+      "F3043": null,
+      "F3836": 977363.1,
+      "F3887": 58,
+      "F3889": "G365D",
+      "F3891": "salaried",
+      "F3894": 32.0
+    }
+  },
+  "borderline": {
+    "description": "Score sits between the borderline and alert thresholds \u2014 the watchlist-promotion demo case",
+    "actual_label": 0,
+    "model_score": 0.029889,
+    "features": {
+      "F115": 0.42,
+      "F321": 1.62,
+      "F527": 1.03,
+      "F531": 1.95,
+      "F670": 0.0,
+      "F1692": 0.0,
+      "F2082": 0.0,
+      "F2122": 0.0,
+      "F2582": -0.01,
+      "F2678": null,
+      "F2737": -0.18,
+      "F2956": 22.0,
+      "F3043": null,
+      "F3836": 1245542.92,
+      "F3887": 98,
+      "F3889": "G365D",
+      "F3891": "selfemployed",
+      "F3894": 33.0
+    }
+  }
+}
