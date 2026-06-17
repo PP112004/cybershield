@@ -14,8 +14,15 @@ produce a verdict or a score.
 from __future__ import annotations
 
 import os
+import threading
 
 import httpx
+
+# Cap concurrent LLM calls so a slow/hung provider can never exhaust FastAPI's
+# request threadpool and stall the deterministic scorer. Over capacity, callers
+# fall back to the template instead of blocking — the LLM is never critical-path.
+_MAX_CONCURRENCY = int(os.environ.get("LLM_MAX_CONCURRENCY", "8"))
+_sem = threading.BoundedSemaphore(_MAX_CONCURRENCY)
 
 DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 GEMINI_URL = (
@@ -49,6 +56,11 @@ def provider() -> str:
 def generate(prompt: str, timeout: float = 30.0) -> str | None:
     """Return narrative text, or None so the caller uses its template."""
     p = provider()
+    if p == "none":
+        return None
+    if not _sem.acquire(blocking=False):
+        # At capacity — don't queue (would hold a request thread). Fall back.
+        return None
     try:
         if p == "deepseek":
             return _deepseek(prompt, timeout)
@@ -56,6 +68,8 @@ def generate(prompt: str, timeout: float = 30.0) -> str | None:
             return _gemini(prompt, timeout)
     except Exception:
         return None
+    finally:
+        _sem.release()
     return None
 
 

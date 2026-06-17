@@ -8,7 +8,7 @@ analyzer locally, and the fusion (`/case`) demo.
 ```bash
 cd serving
 pip install -r requirements.txt
-uvicorn app.main:app --reload      # http://127.0.0.1:8000/docs
+uvicorn app.main:app --reload --env-file .env   # http://127.0.0.1:8000/docs
 ```
 
 The model artifacts are produced by `python3 ../ps2/ps2_train_eval.py`
@@ -30,12 +30,16 @@ The model artifacts are produced by `python3 ../ps2/ps2_train_eval.py`
 
 The LLM writes narratives only; scores and verdicts are always deterministic.
 
-```bash
-export DEEPSEEK_API_KEY=sk-...     # preferred (OpenAI-compatible, cheap)
+Keys live in `serving/.env` (gitignored), loaded by uvicorn's `--env-file .env`:
+
+```
+DEEPSEEK_API_KEY=sk-...     # preferred (OpenAI-compatible, cheap)
 # or
-export GEMINI_API_KEY=...
+GEMINI_API_KEY=...
 # optionally force: LLM_PROVIDER=deepseek|gemini|none
 ```
+
+(Plain `export DEEPSEEK_API_KEY=...` before launching works too.)
 
 ## Tests
 

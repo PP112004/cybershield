@@ -81,9 +81,18 @@ def examples() -> dict:
                              "(run ps2_train_eval.py)")
 
 
+def _score_or_422(features: dict) -> dict:
+    """Scoring can raise on malformed feature values; surface a clean 422
+    rather than a 500 with a traceback that leaks internals."""
+    try:
+        return scorer.score(features)
+    except Exception as exc:
+        raise HTTPException(422, f"could not score account: {exc}") from exc
+
+
 @app.post("/score-account")
 def score_account(req: ScoreRequest) -> dict:
-    result = scorer.score(req.features)
+    result = _score_or_422(req.features)
     hits = fusion.check(req.beneficiaries) if req.beneficiaries else []
     result["fusion"] = fusion.fuse(result, hits)
     return result
@@ -91,11 +100,21 @@ def score_account(req: ScoreRequest) -> dict:
 
 @app.post("/analyze-apk/metadata")
 def analyze_apk_metadata(req: ApkMetadataRequest) -> dict:
-    """Analyze pre-extracted metadata (no binary handling)."""
+    """Analyze pre-extracted metadata (no binary handling).
+
+    This endpoint is public, so by design it is READ-ONLY: it never mutates the
+    shared watchlist that /case adjudicates on. Persisting attacker-controlled
+    IOCs from a public input would let anyone poison the watchlist and trigger
+    false high-confidence alerts on legitimate accounts. The extracted IOCs are
+    returned as candidates; an operator persists them only via a trusted,
+    locally-gated path (ENABLE_WATCHLIST_WRITE=1, or the binary /analyze-apk)."""
     report = apk.risk_engine(req.metadata)
-    added = fusion.add_iocs(report["iocs"], source=report["package_name"]
-                            or "unknown")
-    report["watchlist_iocs_added"] = added
+    if os.environ.get("ENABLE_WATCHLIST_WRITE") == "1":
+        report["watchlist_iocs_added"] = fusion.add_iocs(
+            report["iocs"], source=report["package_name"] or "unknown")
+    else:
+        report["watchlist_iocs_added"] = 0
+        report["candidate_iocs"] = report["iocs"]
     if req.narrative:
         report["analyst_narrative"] = apk.narrative(report)
     return report
@@ -126,7 +145,7 @@ async def analyze_apk(file: UploadFile) -> dict:
 @app.post("/case")
 def case(req: CaseRequest) -> dict:
     """The fusion demo: ML score + watchlist enrichment + unified narrative."""
-    score_result = scorer.score(req.features)
+    score_result = _score_or_422(req.features)
     hits = fusion.check(req.beneficiaries) if req.beneficiaries else []
     fusion_result = fusion.fuse(score_result, hits)
     return {

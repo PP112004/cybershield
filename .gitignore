@@ -12,6 +12,9 @@ __pycache__/
 .venv/
 venv/
 
+# secrets — API keys, never commit
+.env
+
 # logs & OS noise
 *.log
 .DS_Store

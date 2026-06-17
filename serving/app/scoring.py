@@ -88,4 +88,11 @@ class Scorer:
             "thresholds": self.thresholds,
             "reason_codes": reason_codes,
             "model": "key18_lgbm_weighted",
+            "calibration_caveat": (
+                "Score is an uncalibrated upper bound: in the provided dataset "
+                "the extraction batch (F2230) is confounded with the label, so "
+                "the model partly separates on batch rather than fraud. Use the "
+                "score as a relative ranking for alert triage, not as an "
+                "absolute fraud probability, until retrained on matched windows."
+            ),
         }

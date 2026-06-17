@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CyberShield — Solution Approach</title>
+<style>
+  :root{
+    --blue:#0D47A1; --blue2:#1565C0; --teal:#00695C;
+    --orange:#E65100; --green:#2E7D32; --ink:#1c2226; --muted:#5a6570;
+    --line:#dde3ea; --soft:#f3f7fb; --softer:#eef3f8;
+  }
+  @page{ size:A4; margin:14mm 14mm 13mm 14mm; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#fff; color:var(--ink);
+    font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:10.4pt; line-height:1.46; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  h1,h2,h3{ margin:0; }
+  p{ margin:0 0 7px; }
+  .muted{ color:var(--muted); }
+  .nowrap{ white-space:nowrap; }
+  strong{ color:#11181d; }
+
+  /* ---------- title block ---------- */
+  .eyebrow{ font-size:8.6pt; letter-spacing:.10em; text-transform:uppercase;
+    color:var(--blue2); font-weight:700; }
+  .titlebar{ border-top:5px solid var(--blue); border-bottom:1px solid var(--line);
+    padding:10px 0 12px; margin-top:2px; }
+  .title{ font-size:30pt; font-weight:800; letter-spacing:-.5px; color:var(--blue);
+    line-height:1; margin:7px 0 4px; }
+  .subtitle{ font-size:12.2pt; font-weight:600; color:#222; }
+  .metarow{ display:flex; flex-wrap:wrap; gap:4px 16px; margin-top:9px; font-size:9pt; color:var(--muted); }
+  .metarow b{ color:#222; font-weight:700; }
+  .metarow a{ color:var(--blue2); text-decoration:none; }
+
+  /* ---------- the idea + flowchart ---------- */
+  .idea{ background:var(--soft); border:1px solid var(--line); border-left:4px solid var(--orange);
+    border-radius:8px; padding:11px 14px; margin:13px 0 12px; font-size:10pt; }
+  .idea .k{ color:var(--orange); font-weight:800; }
+  .flowwrap{ break-inside:avoid; margin:6px 0 4px; }
+  .flowwrap svg{ width:100%; height:auto; display:block; }
+  .caption{ font-size:8.8pt; color:var(--muted); text-align:center; margin:7px 6px 0; line-height:1.4; }
+  .caption b{ color:#222; }
+
+  /* ---------- sections ---------- */
+  section{ break-inside:avoid; }
+  .h2{ display:flex; align-items:center; gap:9px; margin:16px 0 8px; }
+  .h2 .num{ flex:0 0 auto; width:23px; height:23px; border-radius:6px; background:var(--blue);
+    color:#fff; font-weight:800; font-size:11pt; display:flex; align-items:center; justify-content:center; }
+  .h2 h2{ font-size:13.2pt; color:var(--blue); font-weight:800; }
+  .h2 .tag{ margin-left:auto; font-size:8pt; font-weight:700; letter-spacing:.04em; color:#fff;
+    background:var(--blue2); padding:2px 8px; border-radius:20px; text-transform:uppercase; }
+  .h2 .tag.ps2{ background:var(--teal); }
+  .h2 .tag.fuse{ background:var(--orange); }
+  h3{ font-size:10.4pt; color:#11181d; font-weight:800; margin:9px 0 3px; }
+
+  ul{ margin:3px 0 7px; padding-left:17px; }
+  li{ margin:2px 0; }
+  li::marker{ color:var(--blue2); }
+
+  .callout{ border:1px solid var(--line); border-left:4px solid var(--green);
+    background:#f2f8f3; border-radius:7px; padding:8px 12px; margin:8px 0; font-size:9.6pt; }
+  .callout.warn{ border-left-color:var(--orange); background:#fdf4ec; }
+  .callout.principle{ border-left-color:var(--blue); background:var(--softer); }
+  .callout .lab{ font-weight:800; color:#11181d; }
+
+  table{ width:100%; border-collapse:collapse; margin:7px 0 4px; font-size:8.9pt; }
+  th,td{ text-align:left; padding:5px 7px; border-bottom:1px solid var(--line); }
+  thead th{ background:var(--blue); color:#fff; font-weight:700; border-bottom:none; }
+  tbody tr:nth-child(even){ background:var(--soft); }
+  td.r,th.r{ text-align:right; font-variant-numeric:tabular-nums; }
+  .em{ font-weight:800; color:var(--blue); }
+  .pill{ display:inline-block; background:var(--softer); border:1px solid var(--line);
+    border-radius:5px; padding:1px 6px; font-size:8.4pt; font-family:"SF Mono",Menlo,Consolas,monospace; color:#33424e; }
+
+  .twocol{ display:flex; gap:16px; }
+  .twocol > div{ flex:1; }
+
+  .stats{ display:flex; gap:12px; margin:18px 0 0; }
+  .stat{ flex:1; border:1px solid var(--line); border-radius:9px; padding:11px 14px; background:#fff; }
+  .stat .v{ font-size:21pt; font-weight:800; line-height:1; }
+  .stat .v small{ font-size:12pt; font-weight:800; }
+  .stat .l{ font-size:8.6pt; color:var(--muted); margin-top:5px; line-height:1.35; }
+  .stat.b{ border-top:3px solid var(--blue); } .stat.b .v{ color:var(--blue); }
+  .stat.t{ border-top:3px solid var(--teal); } .stat.t .v{ color:var(--teal); }
+  .stat.o{ border-top:3px solid var(--orange); } .stat.o .v{ color:var(--orange); }
+
+  footer{ margin-top:16px; padding-top:8px; border-top:1px solid var(--line);
+    font-size:8.2pt; color:var(--muted); display:flex; justify-content:space-between; }
+  .pb{ break-before:page; }
+</style>
+</head>
+<body>
+
+  <!-- ============ TITLE ============ -->
+  <div class="titlebar">
+    <div class="eyebrow">PSB's Cybersecurity, Fraud &amp; AI Hackathon 2026 &nbsp;·&nbsp; Bank of India × IIT Hyderabad &nbsp;·&nbsp; DFS (Ministry of Finance) / IBA</div>
+    <div class="title">CyberShield</div>
+    <div class="subtitle">Generative-AI APK Threat Analysis <span class="muted">(PS1)</span> + AI/ML Mule-Account Detection <span class="muted">(PS2)</span> — a single, joined solution</div>
+    <div class="metarow">
+      <span>Team&nbsp;<b>Burning Platform</b></span>
+      <span>Pranjal Prakhar · Loveleen Kaur · Yogesh Verma</span>
+      <span>Problem statements&nbsp;<b>1 &amp; 2 (combined)</b></span>
+      <span>15 June 2026</span>
+      <span>Code&nbsp;<a href="https://github.com/PP112004/cybershield">github.com/PP112004/cybershield</a></span>
+    </div>
+  </div>
+
+  <!-- ============ THE IDEA ============ -->
+  <div class="idea">
+    <span class="k">The idea in one breath.</span> Two problem statements, <b>one fraud kill-chain.</b>
+    PS1 dissects the malicious banking APK and extracts the <b>beneficiary accounts</b> the stolen money is routed to.
+    PS2 scores customer accounts for mule behaviour. PS2's own brief asks the model to ingest
+    <i>"fraud-monitoring solution alerts and govt cyber-fraud alerts/tickets"</i> — so <b>PS1's output becomes
+    exactly that feed.</b> An account that scores <i>borderline</i> on the mule model <b>and</b> matches a
+    trojan-extracted beneficiary is promoted to a <b>high-confidence alert</b> with a GenAI case narrative.
+    Each service stands alone; together they catch the mule neither would alone.
+  </div>
+
+  <!-- ============ FLOWCHART ============ -->
+  <div class="flowwrap">
+    <svg viewBox="0 0 1000 340" role="img" aria-label="CyberShield integration flow chart">
+      <defs>
+        <filter id="sh" x="-10%" y="-10%" width="120%" height="135%">
+          <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-color="#0b2030" flood-opacity="0.18"/>
+        </filter>
+        <marker id="arw" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#33424e"/>
+        </marker>
+        <style>
+          .bt{ font-family:-apple-system,"Helvetica Neue",Helvetica,Arial,sans-serif; }
+          .ttl{ font-weight:800; fill:#fff; }
+          .sub{ fill:#eaf1f8; }
+          .tag{ font-style:italic; }
+          .lk{ stroke:#33424e; stroke-width:2.4; fill:none; }
+          .lkl{ font-size:12.5px; fill:#33424e; font-weight:700; }
+        </style>
+      </defs>
+
+      <!-- connectors (drawn first, under boxes) -->
+      <path class="lk" marker-end="url(#arw)" d="M316,86 C352,96 360,120 386,134"/>
+      <path class="lk" marker-end="url(#arw)" d="M316,254 C352,244 360,220 386,206"/>
+      <path class="lk" marker-end="url(#arw)" d="M616,170 L682,170"/>
+      <text class="bt lkl" x="649" y="158" text-anchor="middle">enrich</text>
+
+      <!-- PS1 box -->
+      <g filter="url(#sh)">
+        <rect x="24" y="26" width="292" height="120" rx="13" fill="#0D47A1"/>
+      </g>
+      <text class="bt ttl" x="44" y="60" font-size="19">PS1 · APK Threat Analysis</text>
+      <text class="bt sub" x="44" y="86" font-size="13.5">Static analysis + YARA-X →</text>
+      <text class="bt sub" x="44" y="105" font-size="13.5">deterministic risk score</text>
+      <text class="bt sub tag" x="44" y="130" font-size="12">↳ extracts beneficiary UPI · C2 · Telegram IOCs</text>
+
+      <!-- PS2 box -->
+      <g filter="url(#sh)">
+        <rect x="24" y="194" width="292" height="120" rx="13" fill="#00695C"/>
+      </g>
+      <text class="bt ttl" x="44" y="228" font-size="19">PS2 · Mule-Account Model</text>
+      <text class="bt sub" x="44" y="254" font-size="13.5">Class-weighted gradient boosting</text>
+      <text class="bt sub" x="44" y="273" font-size="13.5">→ probability + SHAP reason codes</text>
+      <text class="bt sub tag" x="44" y="298" font-size="12">↳ input: account transaction features</text>
+
+      <!-- Intelligence Bus -->
+      <g filter="url(#sh)">
+        <rect x="386" y="84" width="230" height="172" rx="13" fill="#E65100"/>
+      </g>
+      <text class="bt ttl" x="501" y="124" font-size="18" text-anchor="middle">Threat-Intelligence Bus</text>
+      <text class="bt sub" x="501" y="152" font-size="13" text-anchor="middle">Beneficiary watchlist</text>
+      <text class="bt sub" x="501" y="172" font-size="13" text-anchor="middle">+ shared GenAI case writer</text>
+      <text class="bt sub" x="501" y="205" font-size="12.5" text-anchor="middle">PS1 IOCs enrich the</text>
+      <text class="bt sub" x="501" y="224" font-size="12.5" text-anchor="middle">PS2 account score</text>
+
+      <!-- Promoted Alert -->
+      <g filter="url(#sh)">
+        <rect x="682" y="84" width="294" height="172" rx="13" fill="#2E7D32"/>
+      </g>
+      <text class="bt ttl" x="829" y="122" font-size="17" text-anchor="middle">HIGH-CONFIDENCE ALERT</text>
+      <text class="bt sub" x="829" y="150" font-size="13" text-anchor="middle">A borderline account that matches</text>
+      <text class="bt sub" x="829" y="169" font-size="13" text-anchor="middle">a trojan beneficiary is promoted</text>
+      <text class="bt ttl" x="829" y="201" font-size="13.5" text-anchor="middle">+ GenAI case narrative</text>
+      <text class="bt sub" x="829" y="221" font-size="12.5" text-anchor="middle">for the fraud analyst</text>
+    </svg>
+  </div>
+  <div class="caption">
+    <b>The innovation.</b> PS1 and PS2 are each complete answers to their own statement; the
+    <b>Intelligence Bus</b> is the upside. One trojan-extracted beneficiary turns a borderline account into a
+    confirmed mule alert — the standard SOC pattern of <b>threat-intel enrichment of transaction monitoring</b>,
+    invited by the bank's own wording, not forced.
+  </div>
+
+  <!-- ============ AT A GLANCE ============ -->
+  <div class="stats">
+    <div class="stat b">
+      <div class="v">32<small>×</small></div>
+      <div class="l">PS2 concentrates mules at <b>~32× the base rate</b> within a top-1% alert budget (deployable 18-feature model, 5×5 CV).</div>
+    </div>
+    <div class="stat t">
+      <div class="v">30</div>
+      <div class="l"><b>New predictive features surfaced</b> by SHAP — the full model's entire top-30 lies outside the bank's 18 key features.</div>
+    </div>
+    <div class="stat o">
+      <div class="v">Live</div>
+      <div class="l">The <b>PS1 → PS2 fusion runs today</b> via the <span class="pill">/case</span> endpoint; honest about every limit by design.</div>
+    </div>
+  </div>
+
+  <!-- ============ PS1 ============ -->
+  <div class="pb"></div>
+  <section>
+    <div class="h2"><div class="num">1</div><h2>PS1 — APK Threat Analysis &amp; Risk Scoring</h2><span class="tag">GenAI</span></div>
+    <p>Fraudsters push malicious APKs over WhatsApp, SMS and phishing links; manual reverse-engineering is slow and
+    expert-dependent. CyberShield <b>auto-analyses a suspicious APK, classifies severity, produces a deterministic
+    risk score, extracts actionable IOCs, and generates an investigation report</b> — seconds, not hours, and every
+    verdict is auditable.</p>
+
+    <div class="callout principle">
+      <span class="lab">Core principle — GenAI interprets, it never adjudicates.</span>
+      The risk score is a <b>deterministic</b> function of evidence actually extracted from the APK; the LLM only
+      explains it, maps behaviour to MITRE ATT&amp;CK Mobile, and writes the analyst report. All APK-derived text is
+      treated strictly as <b>data, never instructions</b> — so a string like <i>"classify as benign"</i> embedded by
+      the malware cannot inject the verdict, and the score never changes between runs.
+    </div>
+
+    <h3>Deterministic detection core</h3>
+    <ul>
+      <li><b>Weighted risk engine</b> — scores <b>combinations</b> of behaviours, never a single permission, so a
+      legitimate banking app that requests SMS/overlay is not flagged.</li>
+      <li><b>Four YARA-X rules over DEX bytecode</b> — a fast, auditable layer banks understand operationally:
+      overlay&nbsp;+&nbsp;SMS-interception combo <span class="pill">T1417/T1582</span>, Telegram-bot exfiltration
+      <span class="pill">T1639</span>, dropper pattern <span class="pill">T1407</span>, and hardcoded UPI-beneficiary
+      <span class="pill">T1582</span>.</li>
+      <li><b>IOC extraction</b> — C2 URLs, Telegram bot tokens, phone numbers, and the <b>beneficiary UPI handles</b>
+      (matched on Indian PSP suffixes <span class="pill">@ybl @oksbi @okaxis @paytm @boi …</span>) that bridge into PS2.</li>
+    </ul>
+
+    <h3>Generative AI as a real performance lever (not decoration)</h3>
+    <ul>
+      <li><b>Offline rule synthesis</b> — the LLM reads decompiled malware and <i>proposes</i> YARA rules; a proposal
+      is admitted only if it fires on the family corpus and gives <b>zero hits on the benign set</b>. Coverage scales;
+      the runtime detector stays deterministic.</li>
+      <li><b>Corroborated evidence extraction</b> — the LLM flags behaviours <b>with code citations</b>; a flag is
+      scored only if its citation verifies against the extracted strings/APIs. Uncorroborated flags become analyst
+      leads, not scores — a recall gain with hallucination filtered out.</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="lab">Honest on validation.</span> PS1 is judged the way a bank operates — <b>detection rate</b> on
+      known India-targeting families (SpyNote/SpyMax, Drinik, SOVA, Axbanker) and <b>false-positive rate</b> on real
+      banking apps (BOI Mobile, YONO, BHIM) on a held-out split. The risk weights are currently expert-set; we
+      calibrate them against the labelled corpus in the prototype phase and <b>will not fabricate detection numbers.</b>
+    </div>
+  </section>
+
+  <!-- ============ PS2 ============ -->
+  <section>
+    <div class="h2"><div class="num">2</div><h2>PS2 — Suspicious Mule-Account Classification</h2><span class="tag ps2">AI / ML</span></div>
+    <p><b>Dataset reality (it drives every decision):</b> 9,082 accounts × 3,924 anonymised features
+    (<span class="pill">F1…F3924</span>, target <span class="pill">F3924</span>); only <b>81 mules (0.9%)</b>;
+    163 empty columns and 600+ features &gt;90% missing.</p>
+
+    <div class="callout warn">
+      <span class="lab">Dataset-integrity findings — our rigour differentiator.</span>
+      A leakage audit over all 3,924 features surfaced three things most teams miss:
+      <b>(1)</b> <span class="pill">F2230</span> (report month) <b>perfectly confounds batch and label</b> — all
+      negatives extracted Oct-25, all positives Sep/Nov/Dec-25 — so <b>every metric below is an upper bound</b>; we
+      recommend the bank re-extract negatives from matched windows.
+      <b>(2)</b> <span class="pill">F3912</span> is a post-outcome leak (AUC 0.987) — <b>excluded</b>.
+      <b>(3)</b> High-index features pattern like fraud-alert counts — the brief asks to ingest such feeds, so they
+      are <b>retained</b>, subject to (1).
+    </div>
+
+    <h3>Evaluated the way a bank operates — not a single "accuracy" number</h3>
+    <ul>
+      <li><b>Repeated stratified CV (5 folds × 5 repeats)</b> — a single split is meaningless at 81 positives.</li>
+      <li><b>PR-AUC with 95% intervals</b>, and the operating metric: <b>precision / recall / lift at a top-1% alert
+      budget</b> (the 1% of accounts a team can realistically review per day).</li>
+      <li><b>Class-weighting beats SMOTE</b> (confirmed below); missingness is treated as <b>signal</b>, not imputed away.</li>
+    </ul>
+
+    <table>
+      <thead>
+        <tr><th>Model</th><th class="r">PR-AUC</th><th class="r">ROC-AUC</th><th class="r">Prec@1%</th><th class="r">Recall@1%</th><th class="r">Lift@1%</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>Key-18, LightGBM (class-weighted)</b> — deployable</td><td class="r em">0.313</td><td class="r">0.876</td><td class="r">0.287</td><td class="r">0.319</td><td class="r em">32.2×</td></tr>
+        <tr><td>Key-18, LightGBM (SMOTE) — baseline</td><td class="r">0.228</td><td class="r">0.869</td><td class="r">0.247</td><td class="r">0.273</td><td class="r">27.6×</td></tr>
+        <tr><td>Full-feature, LightGBM (class-weighted)</td><td class="r">0.826</td><td class="r">0.977</td><td class="r">0.716</td><td class="r">0.795</td><td class="r">80.2×</td></tr>
+        <tr><td><b>Full-feature, XGBoost (class-weighted)</b> — discovery</td><td class="r em">0.893</td><td class="r">0.981</td><td class="r">0.776</td><td class="r em">0.861</td><td class="r em">86.9×</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="font-size:8.8pt; margin-top:2px;">Mean across 5×5 CV. The compact 18-feature model is the
+    conservative, deployable result — <b>~32× more mules than random</b> at a 1% budget. The full discovery model reaches
+    PR-AUC 0.893 but leans on the high-index alert-count features under the F2230 confound, so we treat its headline as an
+    <b>upper bound</b> and value it for <b>feature discovery</b>.</p>
+
+    <div class="twocol">
+      <div>
+        <h3>"Most relevant features" — delivered</h3>
+        <p>The full model's <b>entire SHAP top-30 lies outside the bank's 18 key features.</b> Strongest new signals:
+        <span class="pill">F3898 F3914 F3908 F3484 F3922 F3805 F3811 F2581 F270 …</span> — precisely the
+        fraud-alert-count-like feeds. Recommendation: promote these to first-class monitoring inputs.</p>
+      </div>
+      <div>
+        <h3>Explainability &amp; honest GenAI position</h3>
+        <p>Every alert ships <b>SHAP reason codes</b>; GenAI turns them into a plain-language analyst narrative.
+        On anonymised tabular data GenAI <b>cannot</b> boost accuracy and we won't claim it — its real lever is
+        parsing free-text <b>NCRP/I4C tickets</b> into new features and watchlist entries.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FUSION ============ -->
+  <section>
+    <div class="h2"><div class="num">3</div><h2>The Integration — Threat-Intelligence Bus (PS1 → PS2)</h2><span class="tag fuse">Innovation</span></div>
+    <p>Indian banking trojans hardcode or fetch <b>beneficiary UPI handles / account numbers</b> (often exfiltrated via
+    Telegram bots). PS1's IOC extraction yields a <b>beneficiary watchlist</b>; PS2 consumes it as an <b>enrichment
+    signal</b> — a borderline account matching a trojan-extracted beneficiary is <b>promoted to a high-confidence alert</b>
+    with a unified GenAI case narrative. This is <b>demonstrated live today</b> via the service's <span class="pill">/case</span>
+    endpoint.</p>
+    <div class="twocol">
+      <div>
+        <h3>Why modular-unified, not a monolith</h3>
+        <p>Prizes are <b>per-topic</b>, so each service must stand alone and fully answer its own statement — the
+        fusion bus is <b>upside, not load-bearing.</b></p>
+      </div>
+      <div>
+        <h3>Honest caveat</h3>
+        <p>The provided data is anonymised, so the join is demonstrated via the scoring API's watchlist input;
+        <b>in production the bank joins extracted IOCs to real account identifiers.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATUS + ROADMAP ============ -->
+  <section>
+    <div class="h2"><div class="num">4</div><h2>What Runs Today, and the Prototype Roadmap</h2></div>
+    <div class="twocol">
+      <div>
+        <h3>Working now (public repo, locally runnable)</h3>
+        <ul>
+          <li>Reproducible PS2 train/eval → real metrics, models &amp; thresholds (one command).</li>
+          <li>FastAPI service: <span class="pill">/score-account</span> (prob + SHAP), <span class="pill">/case</span>
+          (the fusion), gated <span class="pill">/analyze-apk</span>; test suite passing.</li>
+          <li>Four linted YARA-X rules; swappable LLM layer (DeepSeek / Gemini / offline template).</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Prototype phase (1 Jul – 28 Aug 2026)</h3>
+        <ul>
+          <li><b>PS1:</b> labelled-corpus calibration of weights/rules; sandboxed dynamic analysis; full decompilation.</li>
+          <li><b>PS2:</b> probability calibration, threshold tuning, confound ablation, LLM alert narratives.</li>
+          <li><b>Fusion:</b> NCRP/I4C free-text ticket parser → new features &amp; watchlist; host the public PS2 demo.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="lab">Limitations we state loudly.</span> PS2 metrics are upper bounds (F2230 confound) · PS1 risk
+      weights are not yet corpus-calibrated · PS1 static analysis currently scores from extracted metadata
+      (full decompilation + dynamic analysis are prototype-phase) · fusion on anonymised data is shown via watchlist
+      input. Stating these is the point — a banking-security panel finds hidden weaknesses anyway.
+    </div>
+  </section>
+
+  <footer>
+    <span>CyberShield · Team Burning Platform · Solution Approach (PS1 + PS2)</span>
+    <span>github.com/PP112004/cybershield · 15 June 2026</span>
+  </footer>
+
+</body>
+</html>
